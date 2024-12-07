@@ -21,4 +21,4 @@ class PropertyListSerializer(serializers.ModelSerializer):
 class PropertyCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
-        exclude = ['leading_image','reference_number']
+        fields = '__all__'

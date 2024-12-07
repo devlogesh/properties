@@ -1,6 +1,7 @@
 import random
 from .models import *
 from .serializers import *
+from .functions import *
 import os
 from django.conf import settings
 from datetime import datetime
@@ -13,14 +14,6 @@ from rest_framework import status, generics,filters,authentication, permissions
 class CustomPagination(PageNumberPagination):
     page_size = 5
     page_size_query_param = 'page_size'
-
-def reference_number():
-    reference_num = 'PROP'+str(datetime.now().date()).replace('-','')+str(random.randint(10000,99999))
-    prop = Property.objects.filter(reference_number=reference_num)
-    if len(prop) == 0:
-        return reference_num
-    else:
-        return reference_number()
         
 
 
@@ -39,7 +32,7 @@ class ListUserProfile(generics.ListAPIView):
 class CreateUserProfile(APIView):
     def post(self,request):
         val = request.data
-        user_data = {'username' : val.get('username'),'email' : val.get('email'),'password' : val.get('password')}
+        user_data = {'username' : val.get('mobile'),'email' : val.get('email'),'password' : val.get('password')}
         user_serializer = UserCreateSerializer(data=user_data)
         if user_serializer.is_valid():            
             serializer = UserProfileSerializer(data=val)
@@ -102,14 +95,13 @@ class ListProperty(generics.ListAPIView):
     
 class CreateProperty(APIView):
     def post(self,request):
-        val = request.data
+        val = propertyParser(request)
+        
         print(val)
-        print(ll)
         # file = request.FILES['image']
         serializer = PropertyCreateSerializer(data=val)
         if serializer.is_valid():
             serializer.save()
-            property = Property.objects.get(id=serializer.data['id'])
             # if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'images')):
             #     os.makedirs(os.path.join(settings.MEDIA_ROOT, 'images'))
             # file_path = os.path.join(settings.MEDIA_ROOT, 'images', file.name)
@@ -117,11 +109,7 @@ class CreateProperty(APIView):
             #     for chunk in file.chunks():
             #         destination.write(chunk)
             # property.leading_image = file_path
-            reference_num = reference_number()
-            property.reference_number = reference_num
-            property.save()
             serializer_dict = serializer.data
-            serializer_dict['reference_number'] = reference_num
             return Response(serializer_dict,status=status.HTTP_201_CREATED)
             
         else:
@@ -144,8 +132,8 @@ class GetUpdateProperty(APIView):
         try:
             property = self.get_object(pk)
             print(request.data)
-
-            serializer = PropertyCreateSerializer(property,data=request.data)
+            data = propertyParser(request)
+            serializer = PropertyCreateSerializer(property,data=data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data,status=status.HTTP_200_OK)

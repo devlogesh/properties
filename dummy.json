@@ -1,0 +1,55 @@
+{
+    "transaction_type": "sale",
+    "plot_number": "22",
+    "facing": {
+        "label": "North-East",
+        "value": "north_east"
+    },
+    "price": 12000000,
+    "north_south_length": 120,
+    "east_west_length": 1500,
+    "area": 6000,
+    "negotiable": "yes",
+    "access_to_roads": {
+        "label": "Village road",
+        "value": "village_road"
+    },
+    "distance_from_road": 13,
+    "utilities": [
+        "water"
+    ],
+    "amenities": [
+        "floor_access_lift"
+    ],
+    "encumbrance_certificate": "yes",
+    "boundary": "fenced",
+    "water_resource": [
+        "borewell",
+        "well"
+    ],
+    "property_ownership": {
+        "label": "Corporate/Company",
+        "value": "corporate_company"
+    },
+    "approval_type": {
+        "label": "RERA",
+        "value": "rera"
+    },
+    "more_info": "no",
+    "location": "udumalpet",
+    "nearby": "545",
+    "zoning": "outskirts",
+    "status": {
+        "label": "Open",
+        "value": "open"
+    },
+    "address": {
+        "address_line1": "1",
+        "street": "Irumbuliyur",
+        "city": "Chennai",
+        "district": "Chennai",
+        "state": "Tamilnadu",
+        "country": "India",
+        "pincode": "600074"
+    }
+}
