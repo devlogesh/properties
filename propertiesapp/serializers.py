@@ -13,12 +13,33 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = Userprofile
         exclude = ['user_id']
 
-class PropertyListSerializer(serializers.ModelSerializer):
+class HousePropertyListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Property
+        model = HouseProperty
         fields = '__all__'
 
-class PropertyCreateSerializer(serializers.ModelSerializer):
+class HousePropertyCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Property
+        model = HouseProperty
+        fields = '__all__'
+
+class FarmLandPropertyListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FarmLandProperty
+        fields = '__all__'
+
+class FarmLandPropertyCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FarmLandProperty
+        fields = '__all__'
+
+
+class PlotPropertyListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlotProperty
+        fields = '__all__'
+
+class PlotPropertyCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlotProperty
         fields = '__all__'

@@ -1,55 +1,175 @@
-{
-    "transaction_type": "sale",
-    "plot_number": "22",
-    "facing": {
-        "label": "North-East",
-        "value": "north_east"
-    },
-    "price": 12000000,
-    "north_south_length": 120,
-    "east_west_length": 1500,
-    "area": 6000,
-    "negotiable": "yes",
-    "access_to_roads": {
-        "label": "Village road",
-        "value": "village_road"
-    },
-    "distance_from_road": 13,
+form.json
+
+// House / Flats / Apartments
+house_form = {
+    "transaction_type": "lease",
+    "category": "villa",
+    "house_type": "1bhk",
+    "bathrooms": "1",
+    "facing": "north",
+    "parking": [
+        "bike",
+        "car"
+    ],
+    "area": 74,
+    "price": 1000000,
+    "negotiable": "no",
+    "furnishing": "semi_furnished",
+    "total_floors": 1,
+    "floor_number": 0,
+    "power_backup": true,
+    "location": "udumalpet",
+    "access_to_roads": "village_road",
+    "distance_from_road": 3,
     "utilities": [
-        "water"
+        "water",
+        "electricity"
     ],
     "amenities": [
-        "floor_access_lift"
+        "floor_access_lift",
+        "swimming_pool",
+        "gym"
     ],
     "encumbrance_certificate": "yes",
-    "boundary": "fenced",
+    "boundary": "concrete_wall",
     "water_resource": [
         "borewell",
         "well"
     ],
-    "property_ownership": {
-        "label": "Corporate/Company",
-        "value": "corporate_company"
-    },
-    "approval_type": {
-        "label": "RERA",
-        "value": "rera"
-    },
-    "more_info": "no",
-    "location": "udumalpet",
-    "nearby": "545",
-    "zoning": "outskirts",
-    "status": {
-        "label": "Open",
-        "value": "open"
-    },
+    "zoning": "multi_family_housing",
+    "balcony": true,
+    "property_age": "5-10 years",
+    "property_ownership": "others",
+    "approval_type": "cmda",
+    "nearby": "bustand",
+    "more_info": "updated for select fields",
+    "status": "advance",
     "address": {
         "address_line1": "1",
-        "street": "Irumbuliyur",
-        "city": "Chennai",
-        "district": "Chennai",
-        "state": "Tamilnadu",
-        "country": "India",
+        "street": "Westgate St",
+        "city": "Aston",
+        "district": "San Jose",
+        "state": "tamil nadu",
+        "country": "india",
+        "pincode": "100001"
+    },
+    "customer_id": "88",
+    "created_by_id": "123",
+    "updated_by_id": "123"
+}
+// Plots
+plot_form = {
+    "transaction_type": "sale",
+    "plot_number": "22",
+    "facing": "south",
+    "price": 12000000,
+    "north_south_length": 120,
+    "east_west_length": 1500,
+    "area": 1200,
+    "negotiable": "yes",
+    "access_to_roads": "city_road",
+    "distance_from_road": 5,
+    "utilities": [
+        "water"
+    ],
+    "amenities": [
+        "garden"
+    ],
+    "encumbrance_certificate": "yes",
+    "boundary": "concrete_wall",
+    "water_resource": [
+        "well"
+    ],
+    "property_ownership": "joint_partnership",
+    "approval_type": "panchayat_approved",
+    "more_info": "good to do these",
+    "location": "88",
+    "nearby": "Dam",
+    "zoning": "industrial",
+    "status": "live_listing",
+    "address": {
+        "address_line1": "123456",
+        "street": "Westgate St",
+        "city": "Aston",
+        "district": "San Jose",
+        "state": "tamil nadu",
+        "country": "india",
         "pincode": "600074"
+    },
+    "customer_id": "88",
+    "created_by_id": "123",
+    "updated_by_id": "123"
+}
+// Farm Land
+farmland_Form = {
+    "transaction_type": "sale",
+    "area": 60000,
+    "price": 12,
+    "negotiable": "yes",
+    "soil_type": "clay",
+    "access_to_roads": "highway",
+    "distance_from_road": 1,
+    "water_resource": [
+        "well"
+    ],
+    "irrigation_facilities": [
+        "surface",
+        "manual"
+    ],
+    "electricity": true,
+    "boundary": "fenced",
+    "encumbrance_certificate": "yes",
+    "property_ownership": "individual",
+    "approval_type": "dtcp",
+    "more_info": "good to farm and enjoy",
+    "location": "udumalpet",
+    "nearby": "town",
+    "zoning": "outskirts",
+    "status": "open",
+    "address": {
+        "address_line1": "1",
+        "street": "Westgate St",
+        "city": "Aston",
+        "district": "San Jose",
+        "state": "tamil nadu",
+        "country": "india",
+        "pincode": "100001"
+    },
+    "customer_id": "88",
+    "created_by_id": "123",
+    "updated_by_id": "123"
+}
+// customer form
+new_customer = {
+    "customer_name": "Hari",
+    "mobile_number": "7894561231",
+    "e_mail": "hari@spaceservices.in",
+    "verified": true,
+    "location": "chennai",
+    "address": {
+        "address_line1": "1",
+        "street": "Westgate St",
+        "city": "Aston",
+        "district": "San Jose",
+        "state": "tamil nadu",
+        "country": "india",
+        "pincode": "1"
+    }
+}
+// user form
+new_user = {
+    "user_name": "root",
+    "mobile_number": "7894561231",
+    "e_mail": "hari@spaceservices.in",
+    "location": "udumalpet",
+    "user_type": "admin",
+    "address": {
+        "address_line1": "1",
+        "street": "Westgate St",
+        "city": "Chennai",
+        "district": "San Jose",
+        "state": "tamil nadu",
+        "country": "india",
+        "pincode": "100001"
     }
 }

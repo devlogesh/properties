@@ -7,8 +7,20 @@ from .models import *
 class UserprofileAdmin(ImportExportModelAdmin):
     pass
 
-@admin.register(Property)
-class PropertyAdmin(ImportExportModelAdmin):
+@admin.register(AccessToken)
+class AccessTokenAdmin(ImportExportModelAdmin):
+    pass
+
+@admin.register(HouseProperty)
+class HousePropertyAdmin(ImportExportModelAdmin):
+    pass
+
+@admin.register(FarmLandProperty)
+class FarmLandPropertyAdmin(ImportExportModelAdmin):
+    pass
+
+@admin.register(PlotProperty)
+class PlotPropertyAdmin(ImportExportModelAdmin):
     pass
 
 @admin.register(PropertyMedia)

@@ -1,3 +1,4 @@
+
 import random
 from .models import *
 from .serializers import *
@@ -9,6 +10,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import status, generics,filters,authentication, permissions
+
+from django.utils.decorators import method_decorator
+from properties.decorator import bearer_token_required
+from django.contrib.auth import authenticate,login
+from rest_framework.authtoken.models import Token
+
+
+
+
+
 
 
 class CustomPagination(PageNumberPagination):
@@ -24,15 +35,28 @@ class ListUserProfile(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = super(ListUserProfile, self).get_queryset()
-        state = self.request.query_params.get('state')
-        if state:
-            return queryset.filter(state__icontains=state)
+        user_type = self.request.query_params.get('user_type')
+        mobile_number = self.request.query_params.get('mobile_number')
+        customer_number = self.request.query_params.get('customer_number')
+        username = self.request.query_params.get('customer_name')
+        if user_type:
+            if user_type=='customer':
+                return queryset.filter(user_type='customer')
+            else:
+                return queryset.exclude(user_type='customer')
+        if mobile_number:
+            return queryset.filter(mobile__icontains=mobile_number)
+        if customer_number:
+            return queryset.filter(customer_number__icontains=customer_number)
+        if username:
+            return queryset.filter(username__icontains=customer_number)
+        
         return queryset
 
 class CreateUserProfile(APIView):
     def post(self,request):
-        val = request.data
-        user_data = {'username' : val.get('mobile'),'email' : val.get('email'),'password' : val.get('password')}
+        val = user_params(request)
+        user_data = {'username' : val['mobile'],'email' : val['email'],'password' : val['password']}
         user_serializer = UserCreateSerializer(data=user_data)
         if user_serializer.is_valid():            
             serializer = UserProfileSerializer(data=val)
@@ -49,11 +73,39 @@ class CreateUserProfile(APIView):
                 return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
         else:
             return Response(user_serializer.errors,status.HTTP_400_BAD_REQUEST)
+        
+# @method_decorator(csrf_exempt, name='dispatch')
+class UserLoginAPIView(APIView):
 
+    def post(self,request,**kwargs):
+        user_params = request.data
+        username = user_params.get('username')
+        password = user_params.get('password')
+
+        if username and password:
+            user = authenticate(username=user_params['username'],password=user_params['password'])
+            if user:
+                login(request,user)
+                profile = Userprofile.objects.get(user_id=user.id)
+
+                token_id = Token.objects.filter(user_id = user.id)
+                if len(token_id)>0:
+                    token_id.delete()
+                token,create = Token.objects.get_or_create(user=user)
+                token_obj = AccessToken.objects.create(user_id=user,key=token.key)
+                return Response({'user_id':user.id,'token':token.key}, status=status.HTTP_200_OK)
+            else:
+                errors = {'message':'Invalid Credentials..'}
+                return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            errors = {'message':'Username and Password should not be empty..'}
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+                 
 class GetUpdateUserProfile(APIView):
     def get_object(self,pk):
         return Userprofile.objects.get(pk=pk)
 
+    @method_decorator(bearer_token_required)
     def get(self,request,pk,format=None):
         try:
             userprofile = self.get_object(pk)
@@ -63,12 +115,13 @@ class GetUpdateUserProfile(APIView):
             content = {'message': 'No Record Found'}
             return Response(content,status=status.HTTP_400_BAD_REQUEST)
         
+    @method_decorator(bearer_token_required)
     def put(self,request,pk,format=None):
         try:
             userprofile = self.get_object(pk)
             print(request.data)
-
-            serializer = UserProfileSerializer(userprofile,data=request.data)
+            val = user_params(request)
+            serializer = UserProfileSerializer(userprofile,data=val)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data,status=status.HTTP_200_OK)
@@ -79,27 +132,28 @@ class GetUpdateUserProfile(APIView):
             content = {'message': 'No Record Found'}
             return Response(content,status=status.HTTP_400_BAD_REQUEST)
         
-
-
-class ListProperty(generics.ListAPIView):
-    queryset = Property.objects.filter(active=True)
-    serializer_class = PropertyListSerializer
+# @method_decorator(bearer_token_required,name='dispatch') 
+class ListHouseProperty(generics.ListAPIView):
+    
+    queryset = HouseProperty.objects.filter(active=True)
+    serializer_class = HousePropertyListSerializer
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        queryset = super(ListProperty, self).get_queryset()
+        queryset = super().get_queryset()
         reference_number = self.request.query_params.get('reference_number')
         if reference_number:
             return queryset.filter(reference_number=reference_number)
         return queryset
     
-class CreateProperty(APIView):
+class CreateHouseProperty(APIView):
+    @method_decorator(bearer_token_required)
     def post(self,request):
-        val = propertyParser(request)
+        val = house_propertyParser(request)
         
         print(val)
         # file = request.FILES['image']
-        serializer = PropertyCreateSerializer(data=val)
+        serializer = HousePropertyCreateSerializer(data=val)
         if serializer.is_valid():
             serializer.save()
             # if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'images')):
@@ -115,25 +169,175 @@ class CreateProperty(APIView):
         else:
             return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
         
-class GetUpdateProperty(APIView):
+class GetUpdateHouseProperty(APIView):
     def get_object(self,pk):
-        return Property.objects.get(pk=pk)
-
+        return HouseProperty.objects.get(pk=pk)
+    
+    @method_decorator(bearer_token_required)
     def get(self,request,pk,format=None):
+        print(request.user)
         try:
             property = self.get_object(pk)
-            serializer = PropertyListSerializer(property)
+            serializer = HousePropertyListSerializer(property)
             return Response(serializer.data,status=status.HTTP_200_OK)
         except:
             content = {'message': 'No Record Found'}
             return Response(content,status=status.HTTP_400_BAD_REQUEST)
-        
+
+    @method_decorator(bearer_token_required)
     def put(self,request,pk,format=None):
         try:
             property = self.get_object(pk)
             print(request.data)
-            data = propertyParser(request)
-            serializer = PropertyCreateSerializer(property,data=data)
+            data = house_propertyParser(request)
+            if 'reference_number' not in  data:
+                content = {'message': 'Reference Number Required'}
+                return Response(content,status=status.HTTP_400_BAD_REQUEST)
+            serializer =HousePropertyCreateSerializer(property,data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            
+        except:
+            content = {'message': 'No Record Found'}
+            return Response(content,status=status.HTTP_400_BAD_REQUEST)
+        
+# @method_decorator(bearer_token_required,name='dispatch') 
+class ListFarmLandProperty(generics.ListAPIView):
+    
+    queryset = FarmLandProperty.objects.filter(active=True)
+    serializer_class = FarmLandPropertyListSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        reference_number = self.request.query_params.get('reference_number')
+        if reference_number:
+            return queryset.filter(reference_number=reference_number)
+        return queryset
+    
+class CreateFarmLandProperty(APIView):
+    @method_decorator(bearer_token_required)
+    def post(self,request):
+        val = farmland_propertyParser(request)
+        
+        print(val)
+        # file = request.FILES['image']
+        serializer = FarmLandPropertyCreateSerializer(data=val)
+        if serializer.is_valid():
+            serializer.save()
+            # if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'images')):
+            #     os.makedirs(os.path.join(settings.MEDIA_ROOT, 'images'))
+            # file_path = os.path.join(settings.MEDIA_ROOT, 'images', file.name)
+            # with open(file_path, 'wb+') as destination:
+            #     for chunk in file.chunks():
+            #         destination.write(chunk)
+            # property.leading_image = file_path
+            serializer_dict = serializer.data
+            return Response(serializer_dict,status=status.HTTP_201_CREATED)
+            
+        else:
+            return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
+        
+class GetUpdateFarmLandProperty(APIView):
+    def get_object(self,pk):
+        return FarmLandProperty.objects.get(pk=pk)
+    
+    @method_decorator(bearer_token_required)
+    def get(self,request,pk,format=None):
+        print(request.user)
+        try:
+            property = self.get_object(pk)
+            serializer = FarmLandPropertyListSerializer(property)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except:
+            content = {'message': 'No Record Found'}
+            return Response(content,status=status.HTTP_400_BAD_REQUEST)
+
+    @method_decorator(bearer_token_required)
+    def put(self,request,pk,format=None):
+        try:
+            property = self.get_object(pk)
+            print(request.data)
+            data = farmland_propertyParser(request)
+            if 'reference_number' not in  data:
+                content = {'message': 'Reference Number Required'}
+                return Response(content,status=status.HTTP_400_BAD_REQUEST)
+            serializer =FarmLandPropertyCreateSerializer(property,data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            
+        except:
+            content = {'message': 'No Record Found'}
+            return Response(content,status=status.HTTP_400_BAD_REQUEST)
+        
+# @method_decorator(bearer_token_required,name='dispatch') 
+class ListPlotProperty(generics.ListAPIView):
+    
+    queryset = PlotProperty.objects.filter(active=True)
+    serializer_class = PlotPropertyListSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        reference_number = self.request.query_params.get('reference_number')
+        if reference_number:
+            return queryset.filter(reference_number=reference_number)
+        return queryset
+    
+class CreatePlotProperty(APIView):
+    @method_decorator(bearer_token_required)
+    def post(self,request):
+        val = plot_propertyParser(request)
+        
+        print(val)
+        # file = request.FILES['image']
+        serializer = PlotPropertyCreateSerializer(data=val)
+        if serializer.is_valid():
+            serializer.save()
+            # if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'images')):
+            #     os.makedirs(os.path.join(settings.MEDIA_ROOT, 'images'))
+            # file_path = os.path.join(settings.MEDIA_ROOT, 'images', file.name)
+            # with open(file_path, 'wb+') as destination:
+            #     for chunk in file.chunks():
+            #         destination.write(chunk)
+            # property.leading_image = file_path
+            serializer_dict = serializer.data
+            return Response(serializer_dict,status=status.HTTP_201_CREATED)
+            
+        else:
+            return Response(serializer.errors,status.HTTP_400_BAD_REQUEST)
+        
+class GetUpdatePlotProperty(APIView):
+    def get_object(self,pk):
+        return PlotProperty.objects.get(pk=pk)
+    
+    @method_decorator(bearer_token_required)
+    def get(self,request,pk,format=None):
+        print(request.user)
+        try:
+            property = self.get_object(pk)
+            serializer = PlotPropertyListSerializer(property)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except:
+            content = {'message': 'No Record Found'}
+            return Response(content,status=status.HTTP_400_BAD_REQUEST)
+
+    @method_decorator(bearer_token_required)
+    def put(self,request,pk,format=None):
+        try:
+            property = self.get_object(pk)
+            print(request.data)
+            data = plot_propertyParser(request)
+            if 'reference_number' not in  data:
+                content = {'message': 'Reference Number Required'}
+                return Response(content,status=status.HTTP_400_BAD_REQUEST)
+            serializer =PlotPropertyCreateSerializer(property,data=data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data,status=status.HTTP_200_OK)

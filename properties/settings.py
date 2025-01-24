@@ -45,14 +45,17 @@ INSTALLED_APPS = [
     'propertiesapp',
     'rest_framework',
     'django_filters',
-    'import_export'
+    'import_export',
+    'corsheaders',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', 
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -127,7 +130,23 @@ REST_FRAMEWORK = {
 }
 
 
+CORS_ALLOWED_ORIGINS = [
+    "https://spaceservices.in",
+    "http://127.0.0.1:8000",
+    "http://localhost:4200",
+    "https://localhost:4200",
+]
 
+# CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'x-csrftoken',
+    'authorization',
+    'content-type',
+    'Cache-Control',
+    # 'custom-header-name',  # Add your custom headers here
+]
 
 
 # Internationalization
