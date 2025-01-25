@@ -347,3 +347,25 @@ class GetUpdatePlotProperty(APIView):
         except:
             content = {'message': 'No Record Found'}
             return Response(content,status=status.HTTP_400_BAD_REQUEST)
+        
+
+class GetPropertyByRef(APIView):
+    def post(self,request):
+        reference_number = request.data.get('reference_number')
+        if reference_number:
+            house_list = HouseProperty.objects.filter(reference_number=reference_number)
+            if len(house_list) > 0:
+                serializer = HousePropertyListSerializer(house_list[0])
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            farmland_list = FarmLandProperty.objects.filter(reference_number=reference_number)
+            if len(farmland_list) > 0:
+                serializer = FarmLandPropertyListSerializer(farmland_list[0])
+                return Response(serializer.data,status=status.HTTP_200_OK)
+            plot_list = PlotProperty.objects.filter(reference_number=reference_number)
+            if len(plot_list) > 0:
+                serializer = PlotPropertyListSerializer(plot_list[0])
+                return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            content = {'message': 'Please Enter Property Number'}
+            return Response(content,status=status.HTTP_400_BAD_REQUEST)
+        

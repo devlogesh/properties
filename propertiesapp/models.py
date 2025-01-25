@@ -89,7 +89,7 @@ class HouseProperty(models.Model):
     customer_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='customer_id',related_name='+',null=True,blank=True)
     created_by_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='created_by_id',related_name='+',null=True,blank=True)
     updated_by_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='updated_by_id',related_name='+',null=True,blank=True)
-
+    property_type = models.CharField(max_length=255,default='residential')
     class Meta:
         db_table = 'house_property'
         ordering = ['-id']
@@ -128,7 +128,7 @@ class FarmLandProperty(models.Model):
     customer_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='customer_id',related_name='+',null=True,blank=True)
     created_by_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='created_by_id',related_name='+',null=True,blank=True)
     updated_by_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='updated_by_id',related_name='+',null=True,blank=True)
-    
+    property_type = models.CharField(max_length=255,default='farmland')
 
     class Meta:
         db_table = 'farmland_property'
@@ -171,7 +171,7 @@ class PlotProperty(models.Model):
     customer_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='customer_id',related_name='+',null=True,blank=True)
     created_by_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='created_by_id',related_name='+',null=True,blank=True)
     updated_by_id = models.ForeignKey(Userprofile,on_delete=models.PROTECT,db_column='updated_by_id',related_name='+',null=True,blank=True)
-
+    property_type = models.CharField(max_length=255,default='plot')
     class Meta:
         db_table = 'plot_property'
         ordering = ['-id']

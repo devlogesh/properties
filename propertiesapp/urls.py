@@ -19,6 +19,9 @@ urlpatterns = [
     path('plot_property_list/',ListPlotProperty.as_view(),name='plot_property_list'),
     path('plot_property_create/',CreatePlotProperty.as_view(),name='plot_property_create'),
     path('plot_property_get/<int:pk>/',GetUpdatePlotProperty.as_view(),name='plot_property_get'),
+    # ref no. search
+    path('property_search_by_ref/',GetPropertyByRef.as_view(),name='property_search_by_ref'),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
