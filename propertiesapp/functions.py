@@ -45,6 +45,7 @@ def user_params(request):
         'pincode':address.get('pincode'),
         'address_line1':address.get('address_line1'),
         'country':address.get('country'),
+        'verified':val.get('verified',False),
         'customer_number':val['customer_number'] if val.get('customer_number') else str(customer_number),
         'created_by_id':val.get('created_by_id',None),
         'updated_by_id':val.get('updated_by_id',None),

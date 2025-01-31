@@ -23,7 +23,7 @@ from rest_framework.authtoken.models import Token
 
 
 class CustomPagination(PageNumberPagination):
-    page_size = 5
+    page_size = 10
     page_size_query_param = 'page_size'
         
 
@@ -49,7 +49,7 @@ class ListUserProfile(generics.ListAPIView):
         if customer_number:
             return queryset.filter(customer_number__icontains=customer_number)
         if username:
-            return queryset.filter(username__icontains=customer_number)
+            return queryset.filter(username__icontains=username)
         
         return queryset
 
@@ -365,7 +365,51 @@ class GetPropertyByRef(APIView):
             if len(plot_list) > 0:
                 serializer = PlotPropertyListSerializer(plot_list[0])
                 return Response(serializer.data,status=status.HTTP_200_OK)
+            if len(house_list) == 0 and len(farmland_list) == 0 and len(plot_list) == 0:
+                content = {'message': 'Property Not Available'}
+                return Response(content,status=status.HTTP_400_BAD_REQUEST)
         else:
             content = {'message': 'Please Enter Property Number'}
             return Response(content,status=status.HTTP_400_BAD_REQUEST)
         
+
+class DeleteItems(APIView):
+    def post(self,request):
+        item_type = request.data.get('item_type')
+        id = request.data.get('id')
+        if not item_type:
+            return Response({'message':"Please Give Which item could be delete"},status=status.HTTP_400_BAD_REQUEST)
+        if item_type == 'property':
+            property_type = request.data.get('property_type')
+            if not property_type:
+                return Response({'message':"Please Give Property Type"},status=status.HTTP_400_BAD_REQUEST)
+            if property_type == 'residential':
+                try:
+                    house = HouseProperty.objects.get(id=id)
+                    house.delete()
+                    return Response({'message':'success'},status=status.HTTP_200_OK)
+                except:
+                    return Response({'message':"Invalid ID"},status=status.HTTP_400_BAD_REQUEST)
+            if property_type == 'farmland':
+                try:
+                    farm = FarmLandProperty.objects.get(id=id)
+                    farm.delete()
+                    return Response({'message':'success'},status=status.HTTP_200_OK)
+                except:
+                    return Response({'message':"Invalid ID"},status=status.HTTP_400_BAD_REQUEST)
+            if property_type == 'plot':
+                try:
+                    plot = PlotProperty.objects.get(id=id)
+                    plot.delete()
+                    return Response({'message':'success'},status=status.HTTP_200_OK)
+                except:
+                    return Response({'message':"Invalid ID"},status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                profile = Userprofile.objects.get(id=id)
+                user = User.objects.get(id=profile.user_id.id)
+                profile.delete()
+                user.delete()
+                return Response({'message':'success'},status=status.HTTP_200_OK)
+            except:
+                return Response({'message':"Invalid ID"},status=status.HTTP_400_BAD_REQUEST)
